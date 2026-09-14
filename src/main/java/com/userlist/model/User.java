@@ -1,21 +1,28 @@
 package com.userlist.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "users")
 public final class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "firstName")
     private String firstName;
+
+    @Column(name = "lastName")
     private String lastName;
+
+    @Column(name = "age")
     private int age;
+
+    @Column(name = "email")
     private String email;
 
     public User() {}
-
-    public User(long id, String firstName, String lastName, int age, String email) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.age = age;
-        this.email = email;
-    }
 
     public long getId() {
         return id;
@@ -55,14 +62,5 @@ public final class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        return "id: " + this.id + ", "
-                + "firstName: " + this.firstName + ", "
-                + "lastName: " + this.lastName + ", "
-                + "age: " + this.age + ", "
-                + "email: " + this.email;
     }
 }

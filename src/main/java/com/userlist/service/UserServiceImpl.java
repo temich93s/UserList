@@ -3,35 +3,40 @@ package com.userlist.service;
 import com.userlist.dao.UserDao;
 import com.userlist.model.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserDao userDao;
+    private final UserDao userDao;
 
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<User> getUsers() {
         return userDao.getUsers();
     }
 
+    @Transactional
     @Override
-    public boolean addUser(User user) {
-        return userDao.addUser(user);
+    public void addUser(User user) {
+        userDao.addUser(user);
     }
 
+    @Transactional
     @Override
-    public boolean removeUserById(long id) {
-        return userDao.removeUserById(id);
+    public void removeUserById(long id) {
+        userDao.removeUserById(id);
     }
 
+    @Transactional
     @Override
-    public boolean updateUser(User updatedUser) {
-        return userDao.updateUser(updatedUser);
+    public void updateUser(User user) {
+        userDao.updateUser(user);
     }
 }

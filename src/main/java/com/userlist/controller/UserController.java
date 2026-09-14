@@ -1,24 +1,20 @@
 package com.userlist.controller;
 
-import com.userlist.dao.UserDao;
-import com.userlist.dao.UserDaoImpl;
+import com.userlist.exception.UserNotFoundException;
 import com.userlist.model.User;
 import com.userlist.service.UserService;
-import com.userlist.service.UserServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Controller
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -26,8 +22,15 @@ public class UserController {
 
     @GetMapping(value = "/")
     public String userList(ModelMap model) {
-        List<User> users = userService.getUsers();
-        model.addAttribute("users", users);
+        try {
+            List<User> users = userService.getUsers();
+            model.addAttribute("users", users);
+            model.addAttribute("loadSuccess", true);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            model.addAttribute("message", "Server error, try later");
+            model.addAttribute("loadSuccess", false);
+        }
         return "index";
     }
 
@@ -38,12 +41,12 @@ public class UserController {
 
     @PostMapping("/addUser")
     public String addUser(@ModelAttribute User user, ModelMap model) {
-        user.setId(ThreadLocalRandom.current().nextLong());
-        boolean isAddUserSuccess = userService.addUser(user);
-        if (isAddUserSuccess) {
-            model.addAttribute("message", "User add successfully");
-        } else {
-            model.addAttribute("message", "User not added");
+        try {
+            userService.addUser(user);
+            model.addAttribute("message", "User added successfully");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            model.addAttribute("message", "Server error, try later");
         }
         return "addUser";
     }
@@ -54,12 +57,16 @@ public class UserController {
     }
 
     @PostMapping(value = "/removeUser")
-    public String removeUser(@RequestParam Long id, ModelMap model) {
-        boolean isRemoveUserSuccess = userService.removeUserById(id);
-        if (isRemoveUserSuccess) {
+    public String removeUser(@RequestParam long id, ModelMap model) {
+        try {
+            userService.removeUserById(id);
             model.addAttribute("message", "User removed successfully");
-        } else {
+        } catch (UserNotFoundException e) {
+            System.out.println(e.getMessage());
             model.addAttribute("message", "User not found");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            model.addAttribute("message", "Server error, try later");
         }
         return "removeUser";
     }
@@ -71,54 +78,16 @@ public class UserController {
 
     @PostMapping(value = "/updateUser")
     public String updateUser(@ModelAttribute User user, ModelMap model) {
-        boolean isUpdateUserSuccess = userService.updateUser(user);
-        if (isUpdateUserSuccess) {
-            model.addAttribute("message", "User update successfully");
-        } else {
+        try {
+            userService.updateUser(user);
+            model.addAttribute("message", "User updated successfully");
+        } catch (UserNotFoundException e) {
+            System.out.println(e.getMessage());
             model.addAttribute("message", "User not found");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            model.addAttribute("message", "Server error, try later");
         }
         return "updateUser";
-    }
-
-
-
-    // Private
-
-    private void testBD () {
-        System.out.println("-!!!-");
-
-        UserDao userDao = new UserDaoImpl();
-        UserService userService = new UserServiceImpl(userDao);
-
-        System.out.println("--------");
-
-        userService.getUsers().forEach(user -> {
-            System.out.println(user.toString());
-        });
-
-        System.out.println("--------");
-
-        userService.addUser(
-                new User(2, "a1", "b2", 22, "c2")
-        );
-        userService.getUsers().forEach(user -> {
-            System.out.println(user.toString());
-        });
-
-        System.out.println("--------");
-
-        userService.updateUser(
-                new User(2, "a1", "b2", 33, "c2")
-        );
-        userService.getUsers().forEach(user -> {
-            System.out.println(user.toString());
-        });
-
-        System.out.println("--------");
-
-        userService.removeUserById(1);
-        userService.getUsers().forEach(user -> {
-            System.out.println(user.toString());
-        });
     }
 }

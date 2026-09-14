@@ -11,16 +11,9 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
-// Говорит Spring, что этот класс является конфигурационным.
-// Внутри него мы создаём и настраиваем объекты (Bean), необходимые приложению.
 @Configuration
-// Включает Spring MVC: работу с Controller, @GetMapping, @PostMapping и обработку HTTP-запросов.
 @EnableWebMvc
-// Указываем пакет, в котором Spring будет искать свои компоненты.
-// Например классы с @Controller, @Service, @Repository и @Component.
 @ComponentScan("com.userlist")
-// Создаём класс конфигурации веб-части приложения.
-// WebMvcConfigurer позволяет дополнительно настраивать работу Spring MVC.
 public class WebConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;

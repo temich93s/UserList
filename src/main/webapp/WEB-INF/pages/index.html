@@ -8,7 +8,9 @@
     <body>
         <h1>User list</h1>
 
-        <table border="2">
+        <p th:if="${message}" th:text="${message}"></p>
+
+        <table border="2" th:if="${loadSuccess}">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -29,15 +31,17 @@
             </tbody>
         </table>
 
-        <br>
-        <a th:href="@{/addUser}">
-            <button type="button">Add user</button>
-        </a>
-        <a th:href="@{/updateUser}">
-            <button type="button">Update user</button>
-        </a>
-        <a th:href="@{/removeUser}">
-            <button type="button">Remove user</button>
-        </a>
+        <div th:if="${loadSuccess}">
+            <br>
+            <a th:href="@{/addUser}">
+                <button type="button">Add user</button>
+            </a>
+            <a th:href="@{/updateUser}">
+                <button type="button">Update user</button>
+            </a>
+            <a th:href="@{/removeUser}">
+                <button type="button">Remove user</button>
+            </a>
+        </div>
     </body>
 </html>
