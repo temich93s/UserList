@@ -1,7 +1,8 @@
 package com.userlist.service;
 
-import com.userlist.dao.UserDao;
+import com.userlist.exception.UserNotFoundException;
 import com.userlist.model.User;
+import com.userlist.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,33 +11,37 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<User> getUsers() {
-        return userDao.getUsers();
+        return userRepository.findAll();
     }
 
     @Transactional
     @Override
     public void addUser(User user) {
-        userDao.addUser(user);
+        userRepository.save(user);
     }
 
     @Transactional
     @Override
     public void removeUserById(long id) {
-        userDao.removeUserById(id);
+        userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+        userRepository.deleteById(id);
     }
 
     @Transactional
     @Override
     public void updateUser(User user) {
-        userDao.updateUser(user);
+        userRepository.findById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException(String.valueOf(user.getId())));
+        userRepository.save(user);
     }
 }
