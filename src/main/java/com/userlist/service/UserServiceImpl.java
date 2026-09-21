@@ -1,5 +1,6 @@
 package com.userlist.service;
 
+import com.userlist.dto.UserDto;
 import com.userlist.exception.UserNotFoundException;
 import com.userlist.model.User;
 import com.userlist.repository.UserRepository;
@@ -19,21 +20,25 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserDto> getUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(User::toUserDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public User getUserById(long id) {
+    public UserDto getUserById(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)))
+                .toUserDto();
     }
 
     @Transactional
     @Override
-    public void addUser(User user) {
-        userRepository.save(user);
+    public void addUser(UserDto userDto) {
+        userRepository.save(userDto.toUser());
     }
 
     @Transactional
@@ -45,8 +50,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void updateUser(User user) {
-        getUserById(user.getId());
-        userRepository.save(user);
+    public void updateUser(UserDto userDto) {
+        getUserById(userDto.getId());
+        userRepository.save(userDto.toUser());
     }
 }

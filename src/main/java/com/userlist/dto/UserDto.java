@@ -1,29 +1,13 @@
-package com.userlist.model;
+package com.userlist.dto;
 
-import com.userlist.dto.UserDto;
-import jakarta.persistence.*;
+import com.userlist.model.User;
 
-@Entity
-@Table(name = "users")
-public final class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public final class UserDto {
     private long id;
-
-    @Column(name = "firstName")
     private String firstName;
-
-    @Column(name = "lastName")
     private String lastName;
-
-    @Column(name = "age")
     private int age;
-
-    @Column(name = "email")
     private String email;
-
-    public User() {}
 
     public long getId() {
         return id;
@@ -65,13 +49,13 @@ public final class User {
         this.email = email;
     }
 
-    public UserDto toUserDto() {
-        UserDto userDto = new UserDto();
-        userDto.setId(this.id);
-        userDto.setFirstName(this.firstName);
-        userDto.setLastName(this.lastName);
-        userDto.setAge(this.age);
-        userDto.setEmail(this.email);
-        return userDto;
+    public User toUser() {
+        User user = new User();
+        user.setId(this.id);
+        user.setFirstName(this.firstName);
+        user.setLastName(this.lastName);
+        user.setAge(this.age);
+        user.setEmail(this.email);
+        return user;
     }
 }

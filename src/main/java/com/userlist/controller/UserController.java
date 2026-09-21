@@ -1,7 +1,7 @@
 package com.userlist.controller;
 
+import com.userlist.dto.UserDto;
 import com.userlist.exception.UserNotFoundException;
-import com.userlist.model.User;
 import com.userlist.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,8 +22,8 @@ public class UserController {
     @GetMapping(value = "/")
     public String userList(ModelMap model) {
         try {
-            List<User> users = userService.getUsers();
-            model.addAttribute("users", users);
+            List<UserDto> userDtoList = userService.getUsers();
+            model.addAttribute("users", userDtoList);
             model.addAttribute("loadSuccess", true);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -39,9 +39,9 @@ public class UserController {
     }
 
     @PostMapping("/addUser")
-    public String addUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
+    public String addUser(@ModelAttribute UserDto userDto, RedirectAttributes redirectAttributes) {
         try {
-            userService.addUser(user);
+            userService.addUser(userDto);
             redirectAttributes.addFlashAttribute("message", "User added successfully");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -68,8 +68,8 @@ public class UserController {
     @GetMapping(value = "/updateUser/{id}")
     public String updateUser(@PathVariable long id, ModelMap model) {
         try {
-            User user = userService.getUserById(id);
-            model.addAttribute("user", user);
+            UserDto userDto = userService.getUserById(id);
+            model.addAttribute("user", userDto);
         } catch (UserNotFoundException e) {
             System.out.println(e.getMessage());
             model.addAttribute("message", "User not found");
@@ -78,10 +78,10 @@ public class UserController {
     }
 
     @PostMapping(value = "/updateUser/{id}")
-    public String updateUser(@PathVariable long id, @ModelAttribute User user, RedirectAttributes redirectAttributes) {
+    public String updateUser(@PathVariable long id, @ModelAttribute UserDto userDto, RedirectAttributes redirectAttributes) {
         try {
-            user.setId(id);
-            userService.updateUser(user);
+            userDto.setId(id);
+            userService.updateUser(userDto);
             redirectAttributes.addFlashAttribute("message", "User updated successfully");
         } catch (UserNotFoundException e) {
             System.out.println(e.getMessage());
