@@ -23,6 +23,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public User getUserById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+    }
+
     @Transactional
     @Override
     public void addUser(User user) {
@@ -32,16 +39,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void removeUserById(long id) {
-        userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+        getUserById(id);
         userRepository.deleteById(id);
     }
 
     @Transactional
     @Override
     public void updateUser(User user) {
-        userRepository.findById(user.getId())
-                .orElseThrow(() -> new UserNotFoundException(String.valueOf(user.getId())));
+        getUserById(user.getId());
         userRepository.save(user);
     }
 }

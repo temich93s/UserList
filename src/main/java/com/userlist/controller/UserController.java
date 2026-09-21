@@ -5,10 +5,9 @@ import com.userlist.model.User;
 import com.userlist.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.List;
 
 @Controller
@@ -40,54 +39,57 @@ public class UserController {
     }
 
     @PostMapping("/addUser")
-    public String addUser(@ModelAttribute User user, ModelMap model) {
+    public String addUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
         try {
             userService.addUser(user);
-            model.addAttribute("message", "User added successfully");
+            redirectAttributes.addFlashAttribute("message", "User added successfully");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            model.addAttribute("message", "Server error, try later");
+            redirectAttributes.addFlashAttribute("message", "Server error, try later");
         }
-        return "addUser";
+        return "redirect:/";
     }
 
-    @GetMapping(value = "/removeUser")
-    public String removeUser(ModelMap model) {
-        return "removeUser";
-    }
-
-    @PostMapping(value = "/removeUser")
-    public String removeUser(@RequestParam long id, ModelMap model) {
+    @PostMapping(value = "/removeUser/{id}")
+    public String removeUser(@PathVariable long id, RedirectAttributes redirectAttributes) {
         try {
             userService.removeUserById(id);
-            model.addAttribute("message", "User removed successfully");
+            redirectAttributes.addFlashAttribute("message", "User removed successfully");
         } catch (UserNotFoundException e) {
             System.out.println(e.getMessage());
-            model.addAttribute("message", "User not found");
+            redirectAttributes.addFlashAttribute("message", "User not found");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            model.addAttribute("message", "Server error, try later");
+            redirectAttributes.addFlashAttribute("message", "Server error, try later");
         }
-        return "removeUser";
+        return "redirect:/";
     }
 
-    @GetMapping(value = "/updateUser")
-    public String updateUser(ModelMap model) {
-        return "updateUser";
-    }
-
-    @PostMapping(value = "/updateUser")
-    public String updateUser(@ModelAttribute User user, ModelMap model) {
+    @GetMapping(value = "/updateUser/{id}")
+    public String updateUser(@PathVariable long id, ModelMap model) {
         try {
-            userService.updateUser(user);
-            model.addAttribute("message", "User updated successfully");
+            User user = userService.getUserById(id);
+            model.addAttribute("user", user);
         } catch (UserNotFoundException e) {
             System.out.println(e.getMessage());
             model.addAttribute("message", "User not found");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            model.addAttribute("message", "Server error, try later");
         }
         return "updateUser";
+    }
+
+    @PostMapping(value = "/updateUser/{id}")
+    public String updateUser(@PathVariable long id, @ModelAttribute User user, RedirectAttributes redirectAttributes) {
+        try {
+            user.setId(id);
+            userService.updateUser(user);
+            redirectAttributes.addFlashAttribute("message", "User updated successfully");
+        } catch (UserNotFoundException e) {
+            System.out.println(e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "User not found");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "Server error, try later");
+        }
+        return "redirect:/";
     }
 }

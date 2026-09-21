@@ -8,28 +8,23 @@
     <body>
         <h1>Update user</h1>
 
-        <form th:action="@{/updateUser}" method="post">
-            <label>ID:<input type="number" name="id" required min="1"></label>
-            <br>
-            <br>
-            <label>FirstName:<input type="text" name="firstName" required min="1"></label>
-            <br>
-            <br>
-            <label>LastName:<input type="text" name="lastName" required min="1"></label>
-            <br>
-            <br>
-            <label>Age:<input type="number" name="age" required min="1"></label>
-            <br>
-            <br>
-            <label>Email:<input type="email" name="email"></label>
-            <br>
-            <br>
-            <a th:href="@{/}">
-                <button type="button">Back</button>
-            </a>
-            <button type="submit">Update user</button>
-        </form>
-
-        <p th:if="${message}" th:text="${message}"></p>
+        <div th:if="${user}">
+            <form th:action="@{/updateUser/{id}(id=${user.id})}" method="post">
+                <label>FirstName:<input th:value="${user.firstName}" type="text" name="firstName" required></label>
+                <br>
+                <br>
+                <label>LastName:<input th:value="${user.lastName}" type="text" name="lastName" required></label>
+                <br>
+                <br>
+                <label>Age:<input th:value="${user.age}" type="number" name="age" required></label>
+                <br>
+                <br>
+                <label>Email:<input th:value="${user.email}" type="email" name="email"></label>
+                <br>
+                <br>
+                <a th:href="@{/}"><button type="button">Back</button></a>
+                <button type="submit">Update user</button>
+            </form>
+        </div>
     </body>
 </html>
