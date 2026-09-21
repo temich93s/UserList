@@ -4,6 +4,8 @@ import com.userlist.dto.UserDto;
 import com.userlist.exception.UserNotFoundException;
 import com.userlist.service.UserService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @Controller
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -28,7 +32,7 @@ public class UserController {
             model.addAttribute("users", userDtoList);
             model.addAttribute("loadSuccess", true);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Failed to userList", e);
             model.addAttribute("message", "Server error, try later");
             model.addAttribute("loadSuccess", false);
         }
@@ -42,7 +46,7 @@ public class UserController {
     }
 
     @PostMapping("/addUser")
-    public String addUser(@Valid @ModelAttribute UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String addUser(@Valid @ModelAttribute("userDto") UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "addUser";
         }
@@ -50,7 +54,7 @@ public class UserController {
             userService.addUser(userDto);
             redirectAttributes.addFlashAttribute("message", "User added successfully");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Failed to addUser", e);
             redirectAttributes.addFlashAttribute("message", "Server error, try later");
         }
         return "redirect:/";
@@ -62,41 +66,42 @@ public class UserController {
             userService.removeUserById(id);
             redirectAttributes.addFlashAttribute("message", "User removed successfully");
         } catch (UserNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Failed to removeUser id {}", id, e);
             redirectAttributes.addFlashAttribute("message", "User not found");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Failed to removeUser id {}", id, e);
             redirectAttributes.addFlashAttribute("message", "Server error, try later");
         }
         return "redirect:/";
     }
 
     @GetMapping(value = "/updateUser/{id}")
-    public String updateUser(@PathVariable long id, ModelMap model) {
+    public String updateUser(@PathVariable long id, ModelMap model, RedirectAttributes redirectAttributes) {
         try {
             UserDto userDto = userService.getUserById(id);
             model.addAttribute("userDto", userDto);
+            return "updateUser";
         } catch (UserNotFoundException e) {
-            System.out.println(e.getMessage());
-            model.addAttribute("message", "User not found");
+            logger.error("Failed to updateUser id {}", id, e);
+            redirectAttributes.addFlashAttribute("message", "User not found");
+            return "redirect:/";
         }
-        return "updateUser";
     }
 
     @PostMapping(value = "/updateUser/{id}")
-    public String updateUser(@PathVariable long id, @Valid @ModelAttribute UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String updateUser(@PathVariable long id, @Valid @ModelAttribute("userDto") UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            return "/updateUser";
+            return "updateUser";
         }
         try {
             userDto.setId(id);
             userService.updateUser(userDto);
             redirectAttributes.addFlashAttribute("message", "User updated successfully");
         } catch (UserNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Failed to updateUser id {}", id, e);
             redirectAttributes.addFlashAttribute("message", "User not found");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Failed to updateUser id {}", id, e);
             redirectAttributes.addFlashAttribute("message", "Server error, try later");
         }
         return "redirect:/";
