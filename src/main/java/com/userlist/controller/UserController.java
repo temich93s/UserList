@@ -3,8 +3,10 @@ package com.userlist.controller;
 import com.userlist.dto.UserDto;
 import com.userlist.exception.UserNotFoundException;
 import com.userlist.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -35,11 +37,15 @@ public class UserController {
 
     @GetMapping(value = "/addUser")
     public String addUser(ModelMap model) {
+        model.addAttribute("userDto", new UserDto());
         return "addUser";
     }
 
     @PostMapping("/addUser")
-    public String addUser(@ModelAttribute UserDto userDto, RedirectAttributes redirectAttributes) {
+    public String addUser(@Valid @ModelAttribute UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "addUser";
+        }
         try {
             userService.addUser(userDto);
             redirectAttributes.addFlashAttribute("message", "User added successfully");
@@ -69,7 +75,7 @@ public class UserController {
     public String updateUser(@PathVariable long id, ModelMap model) {
         try {
             UserDto userDto = userService.getUserById(id);
-            model.addAttribute("user", userDto);
+            model.addAttribute("userDto", userDto);
         } catch (UserNotFoundException e) {
             System.out.println(e.getMessage());
             model.addAttribute("message", "User not found");
@@ -78,7 +84,10 @@ public class UserController {
     }
 
     @PostMapping(value = "/updateUser/{id}")
-    public String updateUser(@PathVariable long id, @ModelAttribute UserDto userDto, RedirectAttributes redirectAttributes) {
+    public String updateUser(@PathVariable long id, @Valid @ModelAttribute UserDto userDto, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "/updateUser";
+        }
         try {
             userDto.setId(id);
             userService.updateUser(userDto);

@@ -8,18 +8,22 @@
     <body>
         <h1>Update user</h1>
 
-        <div th:if="${user}">
-            <form th:action="@{/updateUser/{id}(id=${user.id})}" method="post">
-                <label>FirstName:<input th:value="${user.firstName}" type="text" name="firstName" required></label>
+        <div th:if="${userDto}">
+            <form th:action="@{/updateUser/{id}(id=${userDto.id})}" th:object="${userDto}" method="post">
+                <label>FirstName:<input type="text" th:field="*{firstName}"></label>
+                <label th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></label>
                 <br>
                 <br>
-                <label>LastName:<input th:value="${user.lastName}" type="text" name="lastName" required></label>
+                <label>LastName:<input type="text" th:field="*{lastName}"></label>
+                <label th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></label>
                 <br>
                 <br>
-                <label>Age:<input th:value="${user.age}" type="number" name="age" required></label>
+                <label>Age:<input type="number" th:field="*{age}"></label>
+                <label th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></label>
                 <br>
                 <br>
-                <label>Email:<input th:value="${user.email}" type="email" name="email"></label>
+                <label>Email:<input type="email" th:field="*{email}"></label>
+                <label th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></label>
                 <br>
                 <br>
                 <a th:href="@{/}"><button type="button">Back</button></a>
